@@ -1,30 +1,30 @@
 # durian
 
-WSGI API application framework base on werkzeug (similar to Flask).
+Durian is a WSGI API application framework based on werkzeug (similar to Flask).
 
-> This is a note-taking project for learning the Flask source code, aimed at gaining a deeper understanding of the inner workings of Flask and implementing a minimal web framework. Flask is an excellent web framework, so remember to avoid reinventing the wheel. And this project is not guaranteed to be maintained.
+> This project is intended as a tool for learning the Flask source code, with the goal of gaining a deeper understanding of the inner workings of Flask and implementing a minimal web framework. Flask is an excellent web framework and you should avoid reinventing the wheel. This project is not guaranteed to be maintained.
 
-**Include**
+**Durian includes the following features:**
 
-- url router (Werkzeug) and router decorator
+- URL router (Werkzeug) and router decorator
 - Global request (base on ContextVar)
 - APIException and Exception decorator
-- only JSONResponse
-- Type hint
+- JSONResponse only
+- Type hinting
 
-**Exclude**
+**Durian excludes the following features:**
 
-- custom header
-- session
-- app config
+- Custom headers
+- Session
+- App configuration
 - Blueprint
-- ClassView
-- template (jinja2)
-- file
-- signal
+- Class-based views
+- Template (jinja2)
+- File handling
+- Signal
 - before/after decorator
-- cli
-- log
+- CLI
+- Logging
 
 ![flow](example/flow.excalidraw.png)
 
@@ -78,6 +78,6 @@ app.run("127.0.0.1", 8000)
 
 ```
 
-run `python example/app.py` result
+Runing the example with `python example/app.py` will give you the following result:
 
 ![result](example/result.png)

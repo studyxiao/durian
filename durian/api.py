@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 
 class API:
-    """WSGI API application framework base on werkzeug (similar to Flask)."""
+    """WSGI API application framework based on werkzeug (similar to Flask)."""
 
     # Step 3.1 register routes
     routes: Map = Map()

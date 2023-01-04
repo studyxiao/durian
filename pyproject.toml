@@ -1,0 +1,15 @@
+[tool.pdm]
+
+[project]
+name = "durian"
+version = "0.0.1"
+description = "Minimal WSGI API framework base on werkzeug"
+authors = [{ name = "studyxiao", email = "studyxiao@163.com" }]
+dependencies = [
+    "werkzeug>=2.2.2",
+]
+requires-python = ">=3.10"
+license = { text = "MIT" }
+
+[tool.ruff]
+line-length = 120

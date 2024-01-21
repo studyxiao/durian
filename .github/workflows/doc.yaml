@@ -1,0 +1,49 @@
+name: Documentation
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  doc:
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up PDM (with Python)
+        uses: pdm-project/setup-pdm@v3
+        with:
+          python-version: 3.12
+          version: 2.12.2
+          cache: true
+
+      - name: Install dependencies
+        run: |
+          pdm sync -dG doc
+
+      - name: Build Site
+        run: pdm run mkdocs build
+
+      - name: Enable Pages App
+        uses: actions/configure-pages@v4
+
+      - name: Packaging and Uploading to Stage
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy from Stage
+        id: deployment
+        uses: actions/deploy-pages@v4

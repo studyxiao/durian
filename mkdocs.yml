@@ -1,0 +1,47 @@
+site_name: Durian
+
+repo_url: https://github.com/studyxiao/durian
+repo_name: studyxiao/durian
+
+theme:
+  name: "material"
+  language: zh
+  features:
+    - navigation.top
+    - toc.follow
+    - search.suggest
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+
+plugins:
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
+  - search
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      linenums: true
+      anchor_linenums: true
+      auto_title: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - tables
+  - attr_list
+  - md_in_html
+  - pymdownx.emoji
+  - toc:
+      permalink: "#"
+
+nav:
+  - Durian: index.md

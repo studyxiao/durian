@@ -1,0 +1,47 @@
+name: CI
+run-name: ${{ github.actor }} is running GitHub Actions
+
+# Event: 何时触发此 workflow
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+  # 允许手动触发
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  # PIP caches
+  PIP_CACHE_DIR: ${{ github.workspace }}/pip-cache
+
+# Job: 触发 workflow 后，在一个单独的 runner 上执行的任务，可以并行执行多个 job
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PDM (with Python)
+        uses: pdm-project/setup-pdm@v3
+        with:
+          python-version: 3.12
+          version: 2.12.2
+          cache: true
+      - name: Get Python Location
+        run: echo "pythonLocation=$(pdm info --python)" >> $GITHUB_ENV
+      - name: Install dependencies
+        run: |
+          pdm install # 安装依赖，要不 pyright 找不到依赖
+      - name: Cache pre-commit dependencies
+        id: cached-pre-commit-dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pre-commit/
+          key: pre-commit-4|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
+
+      - name: Execute Pre-Commit
+        run: pdm run pre-commit run --show-diff-on-failure --color=always --all-files

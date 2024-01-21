@@ -1,13 +1,108 @@
-[tool.pdm]
-
 [project]
 name = "durian"
-version = "0.0.1"
-description = "Minimal WSGI API framework based on werkzeug"
-authors = [{ name = "studyxiao", email = "studyxiao@163.com" }]
-dependencies = ["werkzeug>=2.2.2"]
-requires-python = ">=3.10"
+version = "0.1.0"
+description = "WSGI API application/framework based on werkzeug (similar to Flask)."
+authors = [
+  { name = "studyxiao", email = "studyxiao@163.com" },
+]
+dependencies = []
+requires-python = ">=3.12"
+readme = "README.md"
 license = { text = "MIT" }
 
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+
+[tool.pdm]
+distribution = true
+
+[tool.pdm.scripts]
+add-pre-commit = "pre-commit install"
+lint = "pre-commit run --all-files"
+doc = "mkdocs serve"
+
+[tool.pdm.dev-dependencies]
+lint = [
+  "pyright>=1.1.347",
+  "ruff>=0.1.14",
+  "pre-commit>=3.6.0",
+]
+doc = [
+  "mkdocs>=1.5.3",
+  "mkdocs-material>=9.5.4",
+  "mkdocstrings[python]>=0.24.0",
+]
+dev = [
+    "rich>=13.7.0",
+    "ipython>=8.20.0",
+]
+
 [tool.ruff]
+src = ["src"]
 line-length = 120
+fix = true
+
+[tool.ruff.lint]
+preview = true
+select = [
+  "B",   # flake8-bugbear
+  "C4",  # flake8-comprehensions
+  "D",   # pydocstyle
+  "DTZ", # flake8-datetimez
+  "E",   # pycodestyle
+  "F",   # pyflakes
+  "FA",  # flake8-future-annotations
+  "I",   # isort
+  "N",   # pep8-naming
+  "PTH", # flake8-use-pathlib
+  # "Q",   # flake8-quotes
+  "RUF", # ruff
+  # "S",   # bandit
+  "SIM", # flake8-simplify
+  "TRY", # tryceratops
+  "UP",  # pyupgrade
+  "W",   # Warning
+  "YTT", # flake8-2020
+]
+
+ignore = [
+  # Ignore missing docstring
+  "D100",
+  "D101",
+  "D102",
+  "D103",
+  "D104",
+  "D105",
+  "D106",
+  "D107",
+  "D200",
+  "D401",
+  "D415",   # 首行末尾 `.` 可省略
+  "RUF001",
+  "RUF003",
+]
+# fixable = ["ALL"]  # 默认 ALL
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.isort]
+known-first-party = ["src"]
+
+[tool.ruff.format]
+preview = true
+quote-style = "double"
+docstring-code-format = true
+docstring-code-line-length = 80
+
+[tool.pyright]
+# https://github.com/microsoft/pyright/blob/main/docs/configuration.md#sample-pyprojecttoml-file
+venvPath = "."
+venv = ".venv"
+include = ["src"]
+exclude = ["pdm_build.py"]
+ignore = ["pdm_build.py"]
+typeCheckingMode = "strict"
+pythonVersion = "3.12"

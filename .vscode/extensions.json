@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "tamasfe.even-better-toml",
+    "charliermarsh.ruff",
+    "njpwerner.autodocstring",
+    "editorconfig.editorconfig",
+    "ms-vscode-remote.remote-containers",
+  ]
+}

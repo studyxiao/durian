@@ -5,7 +5,9 @@ description = "WSGI API application/framework based on werkzeug (similar to Flas
 authors = [
   { name = "studyxiao", email = "studyxiao@163.com" },
 ]
-dependencies = []
+dependencies = [
+  "werkzeug>=3.0.1",
+]
 requires-python = ">=3.12"
 readme = "README.md"
 license = { text = "MIT" }
@@ -35,8 +37,8 @@ doc = [
   "mkdocstrings[python]>=0.24.0",
 ]
 dev = [
-    "rich>=13.7.0",
-    "ipython>=8.20.0",
+  "rich>=13.7.0",
+  "ipython>=8.20.0",
 ]
 
 [tool.ruff]
@@ -82,6 +84,7 @@ ignore = [
   "D415",   # 首行末尾 `.` 可省略
   "RUF001",
   "RUF003",
+  "TRY003",
 ]
 # fixable = ["ALL"]  # 默认 ALL
 

@@ -11,7 +11,7 @@ class Proxy:
     thus when calling `proxy.x` is the same as dynamically calling `contextvar.get().x`.
     """
 
-    def __init__(self, cv: ContextVar) -> None:
+    def __init__(self, cv: ContextVar[Request]) -> None:
         self._cv = cv
 
     def __getattribute__(self, __name: str):
@@ -31,7 +31,7 @@ class Proxy:
 
 
 # worker-local (a thread or a coroutine) variable
-_cv_request: ContextVar[Request] = ContextVar("request")
+cv_request: ContextVar[Request] = ContextVar("request")
 
 # alias of _cv_request.get(). `cast()` used to remove type error hint.
-request: Request = cast(Request, Proxy(_cv_request))
+request: Request = cast(Request, Proxy(cv_request))

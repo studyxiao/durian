@@ -5,12 +5,12 @@ app = API()
 
 @app.route("/")
 def index():
-    """simple JSON response"""
+    """Simple JSON response"""
     return "hello world!"
 
 
 @app.route("/book/<int:id>", methods=["POST"])
-def book(id):
+def book(id: str):
     """url_parser method status_code response_type"""
     return {"id": id}, 201
 
@@ -22,15 +22,15 @@ def raise_exception():
 
 @app.route("/json", methods=["POST"])
 def handle_json():
-    """handle request body and query param"""
+    """Handle request body and query param"""
     data = request.json or {}
     q = request.args.get("q", "")
     return {**data, "q": q}
 
 
 @app.errorhandler(404)
-def not_found(exception):
-    """define custom error handler"""
+def not_found(exception: Exception):
+    """Define custom error handler"""
     return APIException({"msg": "source not found."}, 404)
 
 

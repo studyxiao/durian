@@ -1,11 +1,12 @@
 from collections import defaultdict
-from typing import TYPE_CHECKING, Callable, Iterable
+from collections.abc import Callable, Iterable
+from typing import TYPE_CHECKING, ClassVar
 
 from werkzeug import Request, run_simple
 from werkzeug.exceptions import HTTPException, default_exceptions
 from werkzeug.routing import Map, Rule
 
-from durian.globals import _cv_request
+from durian.globals import cv_request
 from durian.types import ErrorCallable, ReturnValue, RouteCallable, RouteMethod
 from durian.wrappers import APIException, Response
 
@@ -19,24 +20,20 @@ class API:
     # Step 3.1 register routes
     routes: Map = Map()
     # Bind a path and a view function
-    view_funcs: dict[str, RouteCallable] = {}
+    view_funcs: ClassVar[dict[str, RouteCallable]] = {}
 
-    exception_handler: dict[
-        int | None, dict[type[Exception], ErrorCallable]
-    ] = defaultdict(dict)
+    exception_handler: ClassVar[dict[int | None, dict[type[Exception], ErrorCallable]]] = defaultdict(dict)
 
-    def route(
-        self, path: str, methods: RouteMethod | None = None
-    ) -> Callable[[RouteCallable], RouteCallable]:
+    def route(self, path: str, methods: RouteMethod | None = None) -> Callable[[RouteCallable], RouteCallable]:
         """Decorate a view function for register a route
 
         Args:
             path (str): url string
             methods (RouteMethod | None, optional): allow reqeust methods. Defaults to ("GET",).
         """
+
         # Step 3.2
         def decorator(func: RouteCallable) -> RouteCallable:
-
             self.add_route(path, func, methods)
             return func
 
@@ -64,9 +61,7 @@ class API:
         self.routes.add(Rule(path, endpoint=endpoint, methods=methods))
         self.view_funcs[endpoint] = func
 
-    def errorhandler(
-        self, exc_class_or_code: type[Exception] | int
-    ) -> Callable[[ErrorCallable], ErrorCallable]:
+    def errorhandler(self, exc_class_or_code: type[Exception] | int) -> Callable[[ErrorCallable], ErrorCallable]:
         """Register a function to handle errors by code or exception class.
 
         Args:
@@ -81,7 +76,9 @@ class API:
         return decorator
 
     def handle_user_exception(self, exception: Exception) -> ReturnValue:
-        """When not APIException occurs, it will query whether
+        """Handle user exception.
+
+        When not APIException occurs, it will query whether
         the corresponding processing function is registered,
         and if so, return the function result.
 
@@ -100,7 +97,7 @@ class API:
         self,
         exc_class_or_code: type[Exception] | int,
     ) -> tuple[type[Exception], int | None]:
-        """get exception class and code by exception class or code
+        """Get exception class and code by exception class or code
 
         Args:
             exc_class_or_code (type[Exception] | int): HTTP status code or Exception class
@@ -115,15 +112,13 @@ class API:
         if isinstance(exc_class_or_code, int):
             exc_class = default_exceptions.get(exc_class_or_code)
             if exc_class is None:
-                raise ValueError(
-                    f"{exc_class_or_code} is not a recognized HTTP error code."
-                )
+                raise ValueError(f"{exc_class_or_code} is not a recognized HTTP error code.")
         else:
             exc_class = exc_class_or_code
         if isinstance(exc_class, Exception):
             raise TypeError(f"{exc_class!r} is a instance not a Exception class.")
-        if not issubclass(exc_class, Exception):
-            raise ValueError(f"'{exc_class.__name__}' is not a subclass of Exception.")
+        if not issubclass(exc_class, Exception):  # type: ignore
+            raise TypeError(f"'{exc_class.__name__}' is not a subclass of Exception.")
         if isinstance(exc_class_or_code, APIException):
             code = exc_class_or_code.status_code
         elif isinstance(exc_class_or_code, HTTPException):
@@ -136,7 +131,7 @@ class API:
         Returns:
             WSGIApplication: an instance of :class:`~werkzeug.wrappers.Response`
         """
-        adapter = self.routes.bind_to_environ(_cv_request.get())
+        adapter = self.routes.bind_to_environ(cv_request.get())
         # step 4.
         try:
             rule, values = adapter.match(return_rule=True)
@@ -173,16 +168,15 @@ class API:
         """
         status = None
         if isinstance(rv, tuple):
-            if len(rv) == 2 and isinstance(rv[1], int):
+            if len(rv) == 2 and isinstance(rv[1], int):  # type: ignore
                 rv, status = rv
             else:
                 raise TypeError("Invalid type of return value from a view function")
-        if rv is None:
-            raise TypeError("Invalid type of return value from a view function")
+
         if not isinstance(rv, Response):
             if isinstance(rv, HTTPException):
                 rv = APIException(rv.description, status=rv.code or status)
-            elif isinstance(rv, (str, list, tuple, dict, bytes, bytearray)):
+            elif isinstance(rv, str | list | tuple | dict | bytes | bytearray):  # type: ignore
                 rv = Response(
                     rv,
                     status=status,
@@ -223,14 +217,16 @@ class API:
             return response(environ, start_response)
         finally:
             # clean request
-            _cv_request.reset(self._token)
+            cv_request.reset(self._token)
 
     def parse_request(self, environ: "WSGIEnvironment"):
-        """change environ (dict) to Response (class)
+        """Parse the request and set the request to global variable.
+
+        Change environ (dict) to Response (class)
         as well as change the request to global variable similar to `flask.reuqest`.
         """
         _request = Request(environ)
-        self._token = _cv_request.set(_request)
+        self._token = cv_request.set(_request)
 
     def run(self, host: str = "127.0.0.1", port: int = 8000):
         """Runs the application on local wsgi serve, which is also a web server.

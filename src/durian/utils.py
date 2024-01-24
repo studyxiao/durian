@@ -13,8 +13,5 @@ def setup_logging(path: "StrPath" = "log.yaml"):
     path = Path(path)
     if path.exists():
         f = path.read_text()
-        try:
-            config = yaml.safe_load(f)
-            logging.config.dictConfig(config)
-        except Exception as e:
-            raise e
+        config = yaml.safe_load(f)
+        logging.config.dictConfig(config)

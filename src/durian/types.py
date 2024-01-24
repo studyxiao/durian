@@ -1,22 +1,20 @@
-import typing as t
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any
 
 from werkzeug.exceptions import HTTPException
 
-if t.TYPE_CHECKING:
+if TYPE_CHECKING:
     from durian.wrappers import Response
 
 # Response.body
-ResponseBody: t.TypeAlias = str | bytes | list | dict
+type ResponseBody = str | bytes | list[Any] | dict[Any, Any]
 
-ResponseValue: t.TypeAlias = t.Union[
-    "Response",
-    ResponseBody,
-]
+type ResponseValue = "Response" | ResponseBody
 # the return value from a view function: body or tuple(body, status_code)
-ReturnValue: t.TypeAlias = ResponseValue | tuple[ResponseValue, int] | HTTPException
+type ReturnValue = ResponseValue | tuple[ResponseValue, int] | HTTPException
 
 # view function decorator
-RouteCallable: t.TypeAlias = t.Callable[..., ReturnValue]
-RouteMethod: t.TypeAlias = list[str] | tuple[str] | set[str]
+type RouteCallable = Callable[..., ReturnValue]
+type RouteMethod = list[str] | tuple[str] | set[str]
 
-ErrorCallable = t.Callable[[t.Any], ReturnValue]
+type ErrorCallable = Callable[..., ReturnValue]

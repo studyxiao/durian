@@ -9,15 +9,15 @@ class Response(BaseResponse):
     """API Response"""
 
     body: ResponseBody | None = None
-    status_code: int = 200
-    default_mimetype: str = "application/json"
+    status_code = 200
+    default_mimetype = "application/json"
 
     def __init__(
         self,
         body: ResponseBody | None = None,
         status: int | None = None,
     ) -> None:
-        if not isinstance(body, (bytes, bytearray)):
+        if not isinstance(body, bytes | bytearray):
             self.body = json.dumps(body)  # parse json
         else:
             # TODO bytes handle
@@ -25,15 +25,13 @@ class Response(BaseResponse):
         super().__init__(self.body, status)
 
 
-class APIException(Response, Exception):
+class APIException(Response, Exception):  # noqa: N818
     """same as Response, can be raise error"""
 
     body: ResponseBody | None = "Internal Error"
     status_code: int = 500
 
-    def __init__(
-        self, body: ResponseBody | None = None, status: int | None = None
-    ) -> None:
+    def __init__(self, body: ResponseBody | None = None, status: int | None = None) -> None:
         self.body = body or self.body
         self.status_code = status or self.status_code
         super().__init__(self.body, self.status_code)

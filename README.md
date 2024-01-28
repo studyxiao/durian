@@ -30,8 +30,8 @@ Durian is a WSGI API application framework based on werkzeug (similar to Flask).
 
 ## Requirements
 
-- Python 3.10+
-- Werkzeug 2.2.2+
+- Python 3.12+
+- Werkzeug 3.0.1+
 
 ## Example
 

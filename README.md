@@ -26,7 +26,7 @@ Durian is a WSGI API application framework based on werkzeug (similar to Flask).
 - CLI
 - Logging
 
-![flow](images/flow.excalidraw.png)
+![./docs/images/flow](images/flow.excalidraw.png)
 
 ## Requirements
 
@@ -80,4 +80,4 @@ app.run("127.0.0.1", 8000)
 
 Runing the example with `python example/app.py` will give you the following result:
 
-![result](images/result.png)
+![./docs/images/result](images/result.png)

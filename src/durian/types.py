@@ -15,6 +15,5 @@ type ReturnValue = ResponseValue | tuple[ResponseValue, int] | HTTPException
 
 # view function decorator
 type RouteCallable = Callable[..., ReturnValue]
-type RouteMethod = list[str] | tuple[str] | set[str]
 
 type ErrorCallable = Callable[..., ReturnValue]

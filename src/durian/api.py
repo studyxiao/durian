@@ -7,24 +7,26 @@ from werkzeug.exceptions import HTTPException, default_exceptions
 from werkzeug.routing import Map, Rule
 
 from durian.globals import cv_request
-from durian.types import ErrorCallable, ReturnValue, RouteCallable, RouteMethod
+from durian.types import ErrorCallable, ReturnValue
 from durian.wrappers import APIException, Response
 
 if TYPE_CHECKING:
     from _typeshed.wsgi import StartResponse, WSGIEnvironment
 
 
-class API:
+class API[**P]:
     """WSGI API application framework based on werkzeug (similar to Flask)."""
 
     # Step 3.1 register routes
     routes: Map = Map()
     # Bind a path and a view function
-    view_funcs: ClassVar[dict[str, RouteCallable]] = {}
+    view_funcs: dict[str, Callable[P, ReturnValue]] = {}
 
     exception_handler: ClassVar[dict[int | None, dict[type[Exception], ErrorCallable]]] = defaultdict(dict)
 
-    def route(self, path: str, methods: RouteMethod | None = None) -> Callable[[RouteCallable], RouteCallable]:
+    def route[T: (list[str], tuple[str, ...], set[str]), R](
+        self, path: str, methods: T | None = None
+    ) -> Callable[[Callable[P, ReturnValue]], Callable[P, ReturnValue]]:
         """Decorate a view function for register a route
 
         Args:
@@ -33,17 +35,17 @@ class API:
         """
 
         # Step 3.2
-        def decorator(func: RouteCallable) -> RouteCallable:
+        def decorator(func: Callable[P, ReturnValue]) -> Callable[P, ReturnValue]:
             self.add_route(path, func, methods)
             return func
 
         return decorator
 
-    def add_route(
+    def add_route[T: (list[str], tuple[str, ...], set[str], None)](
         self,
         path: str,
-        func: RouteCallable,
-        methods: RouteMethod | None,
+        func: Callable[P, ReturnValue],
+        methods: T,
     ):
         """Bind a path and a view function as a Rule and register to the route
 
@@ -54,11 +56,9 @@ class API:
         """
         endpoint = func.__name__
         assert endpoint not in self.view_funcs, "route already exists."
+        _methods = ("GET",) if methods is None else {item.upper() for item in methods}
 
-        if methods is None:
-            methods = ("GET",)  # werkzeug auto-add HEAD, OPTIONS
-        methods = {item.upper() for item in methods}
-        self.routes.add(Rule(path, endpoint=endpoint, methods=methods))
+        self.routes.add(Rule(path, endpoint=endpoint, methods=_methods))
         self.view_funcs[endpoint] = func
 
     def errorhandler(self, exc_class_or_code: type[Exception] | int) -> Callable[[ErrorCallable], ErrorCallable]:
@@ -135,7 +135,7 @@ class API:
         # step 4.
         try:
             rule, values = adapter.match(return_rule=True)
-            rv = self.view_funcs[rule.endpoint](**values)
+            rv = self.view_funcs[rule.endpoint](**values)  # type: ignore TODO
         except APIException as e:
             rv = e
         except HTTPException as e:
